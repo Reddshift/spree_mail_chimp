@@ -1,7 +1,6 @@
 class NewsLetterSubscriptionsController < Spree::BaseController
   def create
-    subscription = NewsletterSubscription.new(:email => params[:email])
-    subscription.save
+    subscription = NewsletterSubscription.create(:email => params[:email])
     if subscription.save
       flash[:notice] = "Thanks for signing up."
     else
