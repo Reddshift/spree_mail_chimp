@@ -1,4 +1,4 @@
-class NewsLetterSubscriptionsController < Spree::BaseController
+class NewsletterSubscriptionsController < Spree::BaseController
   def create
     subscription = NewsletterSubscription.create(:email => params[:email])
     if subscription.save
