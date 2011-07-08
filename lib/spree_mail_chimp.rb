@@ -1,5 +1,4 @@
 require 'spree_core'
-require 'spree_mail_chimp_hooks'
 
 module SpreeMailChimp
   class Engine < Rails::Engine
