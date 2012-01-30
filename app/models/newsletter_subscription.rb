@@ -6,34 +6,41 @@ class NewsletterSubscription < ActiveRecord::Base
   require 'hominid'
   
   def member_info
-     @hominid ||= Hominid::API.new(api_key)
+     @hominid ||= Hominid::API.new(NewsletterSubscription.api_key)
      @hominid.list_member_info(list_id, [email])
      rescue Hominid::APIError => e
        Rails.logger.warn "Could not retrieve member info for #{email}"
   end
   
   def subscribe
-     @hominid ||= Hominid::API.new(api_key)
-     @hominid.list_subscribe(list_id, email, merge_vars, "html", subscription_opts)
+     @hominid ||= Hominid::API.new(NewsletterSubscription.api_key)
+     @hominid.list_subscribe(list_id, email, merge_vars, "html", NewsletterSubscription.subscription_opts)
      rescue Hominid::APIError => e
        Rails.logger.warn "Could not subscribe user #{email}"
   end
 
   def unsubscribe
-     @hominid ||= Hominid::API.new(api_key)
+     @hominid ||= Hominid::API.new(NewsletterSubscription.api_key)
      @hominid.list_unsubscribe(list_id, email)
      rescue Hominid::APIError => e
        Rails.logger.warn "Could not unsubscribe user #{email}"
   end
   
-  
+  def self.subscribe_to_list(list_id, email, vars)
+    @hominid ||= Hominid::API.new(api_key)
+    @hominid.list_subscribe(list_id, email, vars, "html", subscription_opts)
+    nil
+  rescue Hominid::APIError => e
+    e.message
+  end
+
   private
 
   def list_id
       Spree::Config.get(:mailchimp_list_id)
   end
   
-  def api_key
+  def self.api_key
       Spree::Config.get(:mailchimp_api_key)
   end
   
@@ -47,7 +54,7 @@ class NewsletterSubscription < ActiveRecord::Base
       merge_vars
   end
 
-  def subscription_opts
+  def self.subscription_opts
       options = {}
       [:mailchimp_double_opt_in, :mailchimp_send_welcome, :mailchimp_send_notify].each do |opt|
           options[opt.to_s.gsub(/^mailchimp_/,'')] = Spree::Config.get(opt)
